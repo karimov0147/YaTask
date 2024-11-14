@@ -10,10 +10,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.toRoute
 import com.example.yatask.ui.screens.homeScreen.HomeScreen
+import com.example.yatask.ui.screens.homeScreen.HomeScreenRoute
+import com.example.yatask.ui.screens.noteInfoScreen.NoteInfoScreenRoute
 import com.example.yatask.ui.screens.noteInfoScreen.NoteScreen
 import com.example.yatask.ui.theme.YaTaskTheme
 import com.example.yatask.utils.NavigationPath
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,14 +30,17 @@ class MainActivity : ComponentActivity() {
                 )
                 {
                     composable(NavigationPath.HOME_SCREEN.name) {
-                        HomeScreen(navController)
+                        HomeScreenRoute(
+                            navigateToEditScreen =  {navController.navigate(NavigationPath.NOTE_SCREEN.name + "/{$it}")}
+                        )
                     }
                     composable(
                         route = NavigationPath.NOTE_SCREEN.name + "/{id}" ,
-                        arguments = listOf(navArgument("id"){ type = NavType.StringType } )
-                    ) {  it ->
-                        val arg = it.arguments?.getString("id") ?: "-1"
-                        NoteScreen(navController , arg )
+                        arguments = listOf(navArgument("id")
+                        { type = NavType.StringType } )
+                    ) {
+                        val arg = it.arguments?.getString("id")
+                        NoteInfoScreenRoute( navArgs = arg  , onBackClicked = {navController.navigateUp()})
                     }
                 }
             }

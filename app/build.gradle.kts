@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp.id)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -65,4 +66,11 @@ dependencies {
     ksp(libs.room.ksp)
     implementation(libs.swipe)
     implementation(libs.viewmodel)
+    implementation(libs.hilt)
+    ksp(libs.hilt.ksp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    debugImplementation(libs.chucer)
+    releaseImplementation(libs.chucer.release)
+    implementation(libs.hilt.viewmodel)
 }

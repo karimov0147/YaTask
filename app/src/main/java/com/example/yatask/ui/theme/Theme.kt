@@ -37,13 +37,6 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-private val myDarkColor = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-
-)
-
 
 @Composable
 fun YaTaskTheme(

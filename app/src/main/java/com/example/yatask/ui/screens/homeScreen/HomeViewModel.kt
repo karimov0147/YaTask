@@ -1,16 +1,19 @@
 package com.example.yatask.ui.screens.homeScreen
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.yatask.data.models.TodoItem
 import kotlinx.coroutines.flow.StateFlow
 
 interface HomeViewModel {
 
-    val viewState : StateFlow<Boolean>
+    val isHideCompletedItems : Boolean
 
-    fun changeViewState(boolean: Boolean)
+    val uiState : StateFlow<HomeScreenUiState>
 
-    fun getAllNoteList(isCompleted : Boolean = false) : SnapshotStateList<TodoItem>
+    fun handleEvent(event : HomeScreenUiEvent)
+
+    fun getList()
+
+    fun changeTaskVisibility(isHideCompletedTasks : Boolean)
 
     fun doneTask(note : TodoItem)
 

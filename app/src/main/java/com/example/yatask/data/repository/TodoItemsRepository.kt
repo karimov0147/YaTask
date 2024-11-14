@@ -1,13 +1,12 @@
 package com.example.yatask.data.repository
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.yatask.data.models.TodoItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface TodoItemsRepository {
 
-    val notionStateList : SnapshotStateList<TodoItem>
-
-    fun getAllNoteList(isCompleted : Boolean) : SnapshotStateList<TodoItem>
+    fun getAllNoteList() : StateFlow<List<TodoItem>>
 
     fun addNote(note : TodoItem)
 
@@ -15,6 +14,7 @@ interface TodoItemsRepository {
 
     fun editNote(note: TodoItem)
 
-    fun findNote(id : String) : TodoItem?
+    suspend fun findNote(id : String) : TodoItem?
 
+    fun complectedTaskSize() : Flow<Int>
 }

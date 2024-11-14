@@ -1,15 +1,27 @@
 package com.example.yatask.ui.screens.noteInfoScreen
 
-import com.example.yatask.data.models.TodoItem
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.yatask.utils.Importance
 import kotlinx.coroutines.flow.StateFlow
+import java.util.Date
 
 interface NoteInfoViewModel {
 
-    val todoItem : StateFlow<TodoItem?>
+    val uiState : StateFlow<NoteInfoScreenUiState>
 
-    fun getNoteById(id : String)
+    fun handleEvent(event: NoteInfoScreenUiEvent)
 
-    fun saveNote(note: TodoItem)
+    fun getNoteById(id : String?)
+
+    fun setText(text : String)
+
+    fun setImportance(importance: Importance)
+
+    fun setDate(date: Date)
+
+    fun saveNote()
+
+    fun removeNote()
+
+    fun showError(error: Throwable)
 
 }

@@ -63,8 +63,14 @@ import me.saket.swipe.SwipeableActionsBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
-    val viewModel : HomeViewModel  = viewModel(HomeViewModelImpl::class)
+fun HomeScreen(
+    uiState: HomeScreenUiState,
+    onDoneTask : (TodoItem) -> Unit ,
+    onRemoveTask : (TodoItem) -> Unit,
+    onClickTask : (String) -> Unit,
+    onClickFab : () -> Unit ,
+    onHideCompletedClick : () -> Unit
+) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val isCollapsed = remember { derivedStateOf { scrollBehavior.state.collapsedFraction > 0.5 } }
 
@@ -75,232 +81,72 @@ fun HomeScreen(navController: NavController) {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFF7F6F2),
                     scrolledContainerColor = Color(0xFFF7F6F2),
-                    titleContentColor = Color.Black,
-                ),
+                    titleContentColor = Color.Black,),
                 title = {
-                    AppBar(!isCollapsed.value , viewModel)
+                    Row(
+                        modifier = Modifier
+                            .padding(end = 24.dp, start = 60.dp)
+
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+
+                            Text("Мои дела",
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight(500),
+                                color = Color.Black)
+
+                            if (isCollapsed.value) {
+                                Text(
+                                    "Выполнено — ${(uiState as HomeScreenUiState.Content).completedTaskSize}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight(400),
+                                    color = Color(0xFF8E8E90)
+                                )
+                            }
+                        }
+                        Image(
+                            painter =  if ((uiState as HomeScreenUiState.Content).isHideCompletedState) painterResource(R.drawable.ic_show) else painterResource(R.drawable.ic_hide)  ,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .padding(bottom = if (isCollapsed.value) 10.dp else 4.dp)
+                                .size(24.dp)
+                                .align(Alignment.Bottom)
+                                .clickable(onClick = {
+                                    onHideCompletedClick.invoke()
+                                })
+                        )
+                    }
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.shadow(if (!isCollapsed.value) 0.dp else 6.dp)
             )
         },
         floatingActionButton = {
-            FAB(navController)
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(color = Color(0xFFF7F6F2)),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-        ) {
-            val state by viewModel.viewState.collectAsState()
-            TaskList( viewModel.getAllNoteList(state) , viewModel , navController)
-        }
-    }
-
-}
-
-@Composable
-fun FAB(navController: NavController) {
-    FloatingActionButton(
-        containerColor = Color(0xFF007AFF),
-        contentColor = Color.White,
-        shape = CircleShape,
-        elevation = FloatingActionButtonDefaults.elevation(6.dp),
-        modifier = Modifier.padding(bottom = 24.dp),
-        onClick = {
-            navController.navigate(
-                NavigationPath.NOTE_SCREEN.name + "/{id}".replace(
-                    "{id}",
-                    "-1"
-                )
-            )
-        },
-    ) {
-        Icon(painterResource(R.drawable.ic_fab), "Floating action button.")
-    }
-}
-
-@Composable
-fun AppBar(state : Boolean ,  viewModel: HomeViewModel) {
-    val state1 by viewModel.viewState.collectAsState()
-    Row(
-        modifier = Modifier
-            .padding(end = 24.dp, start = 60.dp)
-
-    ) {
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-        ) {
-
-            Text(
-                "Мои дела",
-                fontSize = 32.sp,
-                fontWeight = FontWeight(500),
-                color = Color.Black
-            )
-
-            if (state) {
-                Text(
-                    "Выполнено — 5",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFF8E8E90)
-                )
-            }
-        }
-        Image(
-            painter =  if (state1) painterResource(R.drawable.ic_show) else painterResource(R.drawable.ic_hide)  ,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(bottom = if (state) 10.dp else 4.dp)
-                .size(24.dp)
-                .align(Alignment.Bottom)
-                .clickable(onClick = {
-                    viewModel.changeViewState(!state1)
-
-                })
-        )
-    }
-
-
-}
-
-@Composable
-fun TaskList(list: SnapshotStateList<TodoItem>, viewModel: HomeViewModel , navigationController: NavController ) {
-    val state by viewModel.viewState.collectAsState()
-    LaunchedEffect(state) {
-        list
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .padding(start = 8.dp, end = 8.dp)
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Black.copy(alpha = 0.06f),
-                        Color.Black.copy(alpha = 0.12f)
-                    )
-                ), shape = RoundedCornerShape(8.dp)
-            )
-            .padding(bottom = 2.dp, start = 1.dp, end = 1.dp)
-            .background(Color.White, shape = RoundedCornerShape(8.dp))
-            .padding(top = 8.dp, bottom = 8.dp)
-    ) {
-        items(list) {
-            val delete = SwipeAction(
-                onSwipe = {
-                   viewModel.removeTask(it)
+            FloatingActionButton(
+                containerColor = Color(0xFF007AFF),
+                contentColor = Color.White,
+                shape = CircleShape,
+                elevation = FloatingActionButtonDefaults.elevation(6.dp),
+                modifier = Modifier.padding(bottom = 24.dp),
+                onClick = {
+                   onClickFab.invoke()
                 },
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_basket),
-                        contentDescription = null,
-                        modifier = Modifier.padding(16.dp),
-                        tint = Color.White
-                    )
-                },
-                background = Color(0xFFFF3B30),
-                isUndo = true
-            )
-
-            val done = SwipeAction(
-                onSwipe = {
-                    viewModel.doneTask(it)
-                },
-                icon = {
-                    Icon(
-                        painterResource(id = R.drawable.ic_done),
-                        contentDescription = null,
-                        modifier = Modifier.padding(16.dp),
-                        tint = Color.White
-                    )
-                },
-                background = Color(0xFF34C759) ,
-                isUndo = true
-            )
-
-            SwipeableActionsBox(
-                modifier = Modifier,
-                swipeThreshold = 40.dp,
-                startActions = listOf(done),
-                endActions = listOf(delete),
-                backgroundUntilSwipeThreshold = Color(0xFFF7F6F2)
             ) {
-                Item(it , viewModel , navigationController)
+                Icon(painterResource(R.drawable.ic_fab), "Floating action button.")
             }
+        },
+    )
+    { innerPadding ->
+        when (uiState){
+            is HomeScreenUiState.Content -> HomeScreenContent(
+                list = uiState.todoList ,
+                onDoneItem = onDoneTask ,
+                onRemoveItem = onRemoveTask,
+                onClickItem = onClickTask,
+                innerPadding = innerPadding,
+                isHideComplectedTasks = uiState.isHideCompletedState
+            )
         }
     }
 }
 
-@Composable
-fun Item(note : TodoItem, viewModel: HomeViewModel , navigationController: NavController) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 48.dp)
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-            .clickable {
-                navigationController.navigate(
-                    NavigationPath.NOTE_SCREEN.name + "/{id}".replace(
-                        "{id}",
-                        note.id
-                    )
-                )
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-
-        Checkbox(
-            checked =  note.isCompleted,
-            colors = CheckboxColors(
-                checkedBorderColor =  Color(0xFF34C759) ,
-                checkedCheckmarkColor = Color.White,
-                uncheckedCheckmarkColor = Color.Transparent,
-                checkedBoxColor = Color(0xFF34C759),
-                uncheckedBoxColor = if (note.importance == Importance.HIGH) Color(0xFFFF3B30).copy(alpha = 0.16f) else Color.Transparent,
-                disabledCheckedBoxColor = Color.Transparent,
-                disabledUncheckedBoxColor = Color.Transparent,
-                disabledIndeterminateBoxColor = Color.Transparent,
-                uncheckedBorderColor = if (note.importance == Importance.HIGH) Color(0xFFFF3B30) else Color.Black.copy(alpha = 0.2f),
-                disabledBorderColor = Color.Transparent,
-                disabledUncheckedBorderColor = Color.Transparent,
-                disabledIndeterminateBorderColor = Color.Transparent
-            ),
-            modifier = Modifier.size(24.dp),
-            onCheckedChange = {
-                viewModel.doneTask(note)
-            },
-            
-        )
-
-        Text(
-             if (note.importance == Importance.HIGH) "‼\uFE0F "+note.text else note.text,
-            color = if (note.isCompleted) Color.Black.copy(alpha = 0.3f) else Color.Black,
-            fontSize = 16.sp,
-            lineHeight = 20.sp,
-            maxLines = 3,
-            style = if (note.isCompleted) TextStyle(textDecoration = TextDecoration.LineThrough) else TextStyle(textDecoration = TextDecoration.None),
-            textAlign = TextAlign.Left,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(start = 12.dp, end = 12.dp)
-                .weight(1f)
-        )
-
-        Icon(
-            modifier = Modifier
-                .size(24.dp),
-            painter = painterResource(R.drawable.ic_info),
-            contentDescription = null,
-
-            )
-    }
-}
