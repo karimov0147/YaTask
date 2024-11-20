@@ -18,7 +18,7 @@ interface NoteInfoViewModel {
 
     fun setDate(date: Date)
 
-    fun saveNote()
+    fun saveNote(id :String)
 
     fun removeNote()
 

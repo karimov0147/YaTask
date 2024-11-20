@@ -1,12 +1,11 @@
 package com.example.yatask.di
 
-import com.example.yatask.data.source.remote.MainApi
+import com.example.yatask.data.source.remote.TodoApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -14,7 +13,7 @@ import javax.inject.Singleton
 class ApiModule {
 
     @[Provides Singleton]
-    fun providerApi(retrofit: Retrofit) : MainApi = retrofit.create(MainApi::class.java)
+    fun providerApi(retrofit: Retrofit) : TodoApiService = retrofit.create(TodoApiService::class.java)
 
 
 }

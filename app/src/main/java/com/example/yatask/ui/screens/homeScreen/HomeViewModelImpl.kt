@@ -1,10 +1,10 @@
 package com.example.yatask.ui.screens.homeScreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yatask.data.models.TodoItem
-import com.example.yatask.data.repository.TodoItemsRepository
-import com.example.yatask.data.repository.impl.TodoItemRepositoryImpl
+import com.example.yatask.ui.models.TodoItem
+import com.example.yatask.domain.TodoItemsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -25,12 +25,8 @@ class HomeViewModelImpl @Inject constructor(
     override var isHideCompletedItems = false
     private val _uiState = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Content(listOf() , isHideCompletedItems , 0))
     override val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
-    private val scope = viewModelScope + CoroutineExceptionHandler{ context , throwable ->
-
-    }
-
-    init {
-        getList()
+    private val scope = viewModelScope + CoroutineExceptionHandler{ _ , throwable ->
+        Log.d("yaTask", ": $throwable")
     }
 
     override fun handleEvent(event: HomeScreenUiEvent) {
@@ -78,6 +74,5 @@ class HomeViewModelImpl @Inject constructor(
 
         }
     }
-
 
 }

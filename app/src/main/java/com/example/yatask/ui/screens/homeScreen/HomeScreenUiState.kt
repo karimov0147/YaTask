@@ -1,7 +1,6 @@
 package com.example.yatask.ui.screens.homeScreen
 
-import com.example.yatask.data.models.TodoItem
-import kotlinx.coroutines.flow.StateFlow
+import com.example.yatask.ui.models.TodoItem
 
 sealed interface HomeScreenUiState{
     data class Content(val todoList : List<TodoItem>,

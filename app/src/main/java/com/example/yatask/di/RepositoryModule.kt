@@ -1,7 +1,7 @@
 package com.example.yatask.di
 
-import com.example.yatask.data.repository.TodoItemsRepository
-import com.example.yatask.data.repository.impl.TodoItemRepositoryImpl
+import com.example.yatask.domain.TodoItemsRepository
+import com.example.yatask.data.repository.TodoItemRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

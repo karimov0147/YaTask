@@ -1,6 +1,6 @@
-package com.example.yatask.data.repository
+package com.example.yatask.domain
 
-import com.example.yatask.data.models.TodoItem
+import com.example.yatask.ui.models.TodoItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -15,6 +15,8 @@ interface TodoItemsRepository {
     fun editNote(note: TodoItem)
 
     suspend fun findNote(id : String) : TodoItem?
+
+    fun saveNote(note: TodoItem)
 
     fun complectedTaskSize() : Flow<Int>
 }

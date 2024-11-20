@@ -1,14 +1,13 @@
-package com.example.yatask.data.repository.impl
+package com.example.yatask.data.repository
 
 import android.util.Log
-import com.example.yatask.data.models.TodoItem
-import com.example.yatask.data.repository.TodoItemsRepository
-import com.example.yatask.data.source.remote.MainApi
+import com.example.yatask.ui.models.TodoItem
+import com.example.yatask.domain.TodoItemsRepository
+import com.example.yatask.data.source.remote.TodoApiService
 import com.example.yatask.utils.Importance
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import java.util.Date
@@ -16,7 +15,7 @@ import javax.inject.Inject
 
 
 class TodoItemRepositoryImpl @Inject constructor(
-    private val api: MainApi
+    private val api: TodoApiService
 ) : TodoItemsRepository {
     private val taskList = mutableListOf(
         TodoItem("1" , "Купить что-то" , Importance.NORMAL , Date() , true , Date() , Date() ),
@@ -66,13 +65,34 @@ class TodoItemRepositoryImpl @Inject constructor(
         for (it in arr.indices){
             if (arr[it].id == id){
                 return arr[it]
-            }else{
-                continue
             }
         }
         return null
-
     }
+
+    override fun saveNote(note: TodoItem) {
+        val arr = mutableListOf<TodoItem>()
+        arr.addAll(_task.value)
+        Log.d("yaTaskLog", "saveNote:$note ")
+        for (it in arr.indices){
+            Log.d("yaTaskLog", "for:$it ")
+            if (arr[it].id == note.id){
+                Log.d("yaTaskLog", "if:$note   ${arr[it]} ")
+                arr[it] = note
+                _task.update { arr }.also {
+                    Log.d("yaTaskLog", "result if: $arr ")
+                }
+                return
+            }
+
+        }
+
+        arr.add(note)
+        _task.update { arr }.also {
+            Log.d("yaTaskLog", "result else: $arr ")
+        }
+    }
+
 
     override fun complectedTaskSize(): Flow<Int> = flow {
         var size = 0

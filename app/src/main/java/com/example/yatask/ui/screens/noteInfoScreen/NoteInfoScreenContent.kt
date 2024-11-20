@@ -53,13 +53,14 @@ import java.util.Date
 
 @Composable
 fun NoteInfoScreenContent(
-    text : String,
-    importance : Importance,
-    date: Date? ,
+    id : String = "",
+    text : String = "",
+    importance : Importance = Importance.NORMAL,
+    date: Date? = null ,
     onImportanceChanged: (Importance) -> Unit,
     onTextChanged : (String) -> Unit,
     onDateSelected : (Date) -> Unit,
-    onSaveClicked : () -> Unit,
+    onSaveClicked : (id : String) -> Unit,
     onBackClicked : () -> Unit,
     onRemoveClicked : () -> Unit,
 ){
@@ -73,7 +74,7 @@ fun NoteInfoScreenContent(
         })
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        CustomAppBar(saveClicked = onSaveClicked , onBackClicked = onBackClicked)
+        CustomAppBar(saveClicked = onSaveClicked , onBackClicked = onBackClicked , id)
         Column (modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
@@ -83,14 +84,14 @@ fun NoteInfoScreenContent(
             AddNoteLayout(text , onTextChanged)
             ImportanceLayout(importance , onImportanceChanged)
             DateLayout(showDialog  , date)
-            DeleteLayout(onRemoveClicked , onBackClicked)
+            DeleteLayout(onRemoveClicked , onBackClicked )
         }
     }
 }
 
 
 @Composable
-fun CustomAppBar(saveClicked: () -> Unit , onBackClicked: () -> Unit){
+fun CustomAppBar(saveClicked: (id : String) -> Unit , onBackClicked: () -> Unit, id: String){
     Row(modifier = Modifier
         .fillMaxWidth()
         .background(color = Color(0xFFF7F6F2)) ,
@@ -113,12 +114,11 @@ fun CustomAppBar(saveClicked: () -> Unit , onBackClicked: () -> Unit){
         Text(modifier = Modifier
             .height(56.dp)
             .clickable {
-                saveClicked.invoke()
+                saveClicked.invoke(id)
                 onBackClicked.invoke()
             }
             .padding(end = 16.dp, start = 16.dp)
-            .wrapContentHeight(align = Alignment.CenterVertically)
-            ,
+            .wrapContentHeight(align = Alignment.CenterVertically),
             text = "Сохранить".uppercase(),
             color = Color( 0xFF007AFF) ,
             fontSize = 14.sp ,
@@ -247,7 +247,7 @@ fun DateLayout(state : MutableState<Boolean>, date: Date?){
 }
 
 @Composable
-fun DeleteLayout(onRemoveClicked: () -> Unit , onBackClicked: () -> Unit){
+fun DeleteLayout(onRemoveClicked: () -> Unit , onBackClicked: () -> Unit) {
     Column (modifier = Modifier
         .padding(top = 24.dp)
         .height(56.dp)

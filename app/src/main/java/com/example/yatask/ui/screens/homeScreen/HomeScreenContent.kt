@@ -1,6 +1,5 @@
 package com.example.yatask.ui.screens.homeScreen
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yatask.R
-import com.example.yatask.data.models.TodoItem
+import com.example.yatask.ui.models.TodoItem
 import com.example.yatask.utils.Importance
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
@@ -128,26 +127,19 @@ fun TaskList(list: List<TodoItem>,
 }
 
 @Composable
-fun Item(note : TodoItem, onDoneItem: (TodoItem) -> Unit , onClickItem: (String) -> Unit) {
+fun Item(note : TodoItem, onDoneItem: (TodoItem) -> Unit, onClickItem: (String) -> Unit) {
     Row(
         modifier = Modifier
+            .clickable {
+                onClickItem.invoke(note.id)
+            }
             .fillMaxWidth()
             .defaultMinSize(minHeight = 48.dp)
             .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-            .clickable {
-                onClickItem.invoke(note.id)
-//                navigationController.navigate(
-//                    NavigationPath.NOTE_SCREEN.name + "/{id}".replace(
-//                        "{id}",
-//                        note.id
-//                    )
-//                )
-            },
+            ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        val context = LocalContext.current
-
         Checkbox(
             checked =  note.isCompleted,
             colors = CheckboxColors(

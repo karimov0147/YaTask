@@ -1,9 +1,7 @@
-package com.example.yatask.data.models
+package com.example.yatask.ui.models
 
 import com.example.yatask.utils.Importance
 import java.util.Date
-
-
 data class TodoItem (
     val id : String,
     val text : String,

@@ -2,6 +2,7 @@ package com.example.yatask.ui.screens.noteInfoScreen
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -17,16 +18,18 @@ fun NoteInfoScreenRoute(
     onBackClicked : () -> Unit
 ){
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    viewModel.getNoteById(navArgs)
-
+    LaunchedEffect(Unit) {
+        viewModel.getNoteById(navArgs?.substring(1 , navArgs.length-1))
+    }
+    
     NoteScreen(
         uiState = uiState ,
         onTextChanged = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnNoteChanged(it))},
         onDateSelected = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnDateChanged(it))},
         onImportanceChanged = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnImportanceChanged(it))},
-        onSaveClicked = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnSavedButtonClicked) ; onBackClicked.invoke()},
+        onSaveClicked = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnSavedButtonClicked(id = it))},
         onBackClicked = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnCloseButtonClicked) ; onBackClicked.invoke()},
-        onRemoveClicked = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnDeleteItem) ; onBackClicked.invoke()},
+        onRemoveClicked = {viewModel.handleEvent(NoteInfoScreenUiEvent.OnDeleteItem)},
     )
 
 
