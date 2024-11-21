@@ -8,11 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.toRoute
-import com.example.yatask.ui.screens.homeScreen.HomeScreen
 import com.example.yatask.ui.screens.homeScreen.HomeScreenRoute
 import com.example.yatask.ui.screens.noteInfoScreen.NoteInfoScreenRoute
-import com.example.yatask.ui.screens.noteInfoScreen.NoteScreen
 import com.example.yatask.ui.theme.YaTaskTheme
 import com.example.yatask.utils.NavigationPath
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = NavigationPath.NOTE_SCREEN.name + "/{id}" ,
                         arguments = listOf(navArgument("id")
-                        { type = NavType.StringType } )
+                        { type = NavType.StringType} )
                     ) {
                         val arg = it.arguments?.getString("id")
                         NoteInfoScreenRoute( navArgs = arg  , onBackClicked = {navController.navigateUp()})

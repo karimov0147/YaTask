@@ -1,17 +1,20 @@
 package com.example.yatask.ui.screens.homeScreen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yatask.ui.models.TodoItem
-import com.example.yatask.domain.TodoItemsRepository
+import com.example.yatask.domain.useCase.EditTodoUseCase
+import com.example.yatask.domain.useCase.GetTodoUseCase
+import com.example.yatask.domain.useCase.RemoveTodoUseCase
+import com.example.yatask.utils.toDomainDTO
+import com.example.yatask.utils.toRequestDTO
+import com.example.yatask.utils.toTodoItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -20,13 +23,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModelImpl @Inject constructor(
-    private val todoItemsRepository: TodoItemsRepository
+    private val getTodoUseCase : GetTodoUseCase,
+    private val editTodoUseCase: EditTodoUseCase,
+    private val removeTodoUseCase: RemoveTodoUseCase
 ) : HomeViewModel , ViewModel() {
     override var isHideCompletedItems = false
     private val _uiState = MutableStateFlow<HomeScreenUiState>(HomeScreenUiState.Content(listOf() , isHideCompletedItems , 0))
     override val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
     private val scope = viewModelScope + CoroutineExceptionHandler{ _ , throwable ->
-        Log.d("yaTask", ": $throwable")
+        _uiState.update {
+            HomeScreenUiState.Error(
+                throwable.message.toString()
+            )
+        }
     }
 
     override fun handleEvent(event: HomeScreenUiEvent) {
@@ -38,17 +47,29 @@ class HomeViewModelImpl @Inject constructor(
     }
 
     override fun getList() {
+        _uiState.update {
+            HomeScreenUiState.Loading
+        }
         scope.launch {
             withContext(Dispatchers.IO){
-                val list = todoItemsRepository.getAllNoteList().value
-                val size = todoItemsRepository.complectedTaskSize().first()
-                _uiState.update {
-                    HomeScreenUiState.Content(
-                        list,
-                        isHideCompletedItems ,
-                        size
-                    )
-                }
+                getTodoUseCase.getAllNoteList().fold(
+                    onSuccess = { list ->
+                        _uiState.update {
+                           HomeScreenUiState.Content(
+                                list.map { it.toTodoItem() } ,
+                               isHideCompletedItems,
+                               list.filter { it.isCompleted }.size
+                           )
+                        }
+                    } ,
+                    onFailure = { error ->
+                        _uiState.update {
+                            HomeScreenUiState.Error(
+                                error.message.toString()
+                            )
+                        }
+                    }
+                )
             }
         }
     }
@@ -59,17 +80,49 @@ class HomeViewModelImpl @Inject constructor(
     }
 
     override fun doneTask(note: TodoItem) {
+        _uiState.update {
+            HomeScreenUiState.Loading
+        }
         scope.launch(Dispatchers.IO) {
-           todoItemsRepository.editNote(note.copy(isCompleted = true))
-           getList()
+           editTodoUseCase
+               .editNote(note.copy(isCompleted = true)
+               .toDomainDTO())
+               .fold(
+               onSuccess = {
+                   getList()
+               },
+               onFailure = { error ->
+                   _uiState.update {
+                       HomeScreenUiState.Error(
+                           error.message.toString()
+                       )
+                   }
+               }
+           )
+
        }
     }
 
     override fun removeTask(note: TodoItem) {
+        _uiState.update {
+            HomeScreenUiState.Loading
+        }
         scope.launch {
             withContext(Dispatchers.IO){
-                todoItemsRepository.removeNote(note)
-                getList()
+                removeTodoUseCase.removeNote(note.id)
+                    .fold(
+                        onSuccess = {
+                            getList()
+                        },
+                        onFailure = { error ->
+                            _uiState.update {
+                                HomeScreenUiState.Error(
+                                    error.message.toString()
+                                )
+                            }
+                        }
+                    )
+
             }
 
         }

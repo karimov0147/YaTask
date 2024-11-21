@@ -1,4 +1,4 @@
-package com.example.yatask.di
+package com.example.yatask.di.network
 
 import com.example.yatask.data.source.remote.TodoApiService
 import dagger.Module

@@ -1,9 +1,9 @@
-package com.example.yatask.ui.models
+package com.example.yatask.domain.models
 
 import com.example.yatask.utils.Importance
-import java.io.Serializable
 import java.util.Date
-data class TodoItem (
+
+class TodoDomainDTO(
     val id : String,
     val text : String,
     val importance : Importance,
