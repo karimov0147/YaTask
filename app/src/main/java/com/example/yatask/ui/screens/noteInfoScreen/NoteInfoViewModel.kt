@@ -1,5 +1,6 @@
 package com.example.yatask.ui.screens.noteInfoScreen
 
+import com.example.yatask.ui.models.TodoItem
 import com.example.yatask.utils.Importance
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
@@ -18,7 +19,7 @@ interface NoteInfoViewModel {
 
     fun setDate(date: Date)
 
-    fun saveNote(id :String)
+    fun saveNote()
 
     fun removeNote()
 

@@ -2,7 +2,12 @@ package com.example.yatask.ui.screens.noteInfoScreen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.yatask.utils.Importance
 import java.util.Date
@@ -17,6 +22,8 @@ fun NoteScreen(
     onBackClicked : () -> Unit,
     onRemoveClicked : () -> Unit,
 ){
+    val snackBarHostState = remember { SnackbarHostState() }
+
     Box(modifier = Modifier.fillMaxSize()){
         when(uiState){
             is NoteInfoScreenUiState.Content -> NoteInfoScreenContent(
@@ -40,6 +47,21 @@ fun NoteScreen(
                 onRemoveClicked = onRemoveClicked,
                 onImportanceChanged = onImportanceChanged
             )
+
+            is NoteInfoScreenUiState.Error -> {
+                val errorMessage = uiState.message
+                LaunchedEffect(errorMessage) {
+                    snackBarHostState.showSnackbar(errorMessage)
+                }
+            }
+
+            is NoteInfoScreenUiState.Loading -> {
+                Box(Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ){
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
